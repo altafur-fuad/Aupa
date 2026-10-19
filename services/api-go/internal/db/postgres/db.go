@@ -20,9 +20,10 @@ func NewDB(ctx context.Context, databaseURL string) (*DB, error) {
 
 	// Safe connection pool bounds
 	config.MaxConns = 25
-	config.MinConns = 2
+	config.MinConns = 0
 	config.MaxConnIdleTime = 5 * time.Minute
 	config.MaxConnLifetime = 1 * time.Hour
+	config.ConnConfig.ConnectTimeout = 5 * time.Second
 
 	pool, err := pgxpool.NewWithConfig(ctx, config)
 	if err != nil {

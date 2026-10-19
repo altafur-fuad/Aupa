@@ -38,25 +38,25 @@ type Config struct {
 // Load loads configuration from environment variables with safe defaults.
 func Load() (*Config, error) {
 	cfg := &Config{
-		Environment:     getEnv("AUPA_ENV", "development"),
-		Port:            getEnv("PORT", "8080"),
-		ReadTimeout:     getEnvDuration("AUPA_READ_TIMEOUT", 10*time.Second),
-		WriteTimeout:    getEnvDuration("AUPA_WRITE_TIMEOUT", 15*time.Second),
-		IdleTimeout:     getEnvDuration("AUPA_IDLE_TIMEOUT", 60*time.Second),
-		ShutdownTimeout: getEnvDuration("AUPA_SHUTDOWN_TIMEOUT", 10*time.Second),
+		Environment:     getFirstEnv("development", "AUPA_ENV", "ENVIRONMENT", "APP_ENV"),
+		Port:            getFirstEnv("8080", "PORT"),
+		ReadTimeout:     getFirstEnvDuration(10*time.Second, "AUPA_READ_TIMEOUT", "READ_TIMEOUT"),
+		WriteTimeout:    getFirstEnvDuration(15*time.Second, "AUPA_WRITE_TIMEOUT", "WRITE_TIMEOUT"),
+		IdleTimeout:     getFirstEnvDuration(60*time.Second, "AUPA_IDLE_TIMEOUT", "IDLE_TIMEOUT"),
+		ShutdownTimeout: getFirstEnvDuration(10*time.Second, "AUPA_SHUTDOWN_TIMEOUT", "SHUTDOWN_TIMEOUT"),
 
-		JWTSecret:       getEnv("AUPA_JWT_SECRET", "aupa-dev-jwt-secret-do-not-use-in-production-min-32-bytes"),
-		JWTIssuer:       getEnv("AUPA_JWT_ISSUER", "aupa.com.bd"),
-		JWTAudience:     getEnv("AUPA_JWT_AUDIENCE", "aupa-client"),
-		AccessTokenTTL:  getEnvDuration("AUPA_ACCESS_TOKEN_TTL", 15*time.Minute),
-		RefreshTokenTTL: getEnvDuration("AUPA_REFRESH_TOKEN_TTL", 30*24*time.Hour),
+		JWTSecret:       getFirstEnv("aupa-dev-jwt-secret-do-not-use-in-production-min-32-bytes", "AUPA_JWT_SECRET", "JWT_SECRET", "JWT_SIGNING_KEY"),
+		JWTIssuer:       getFirstEnv("aupa.com.bd", "AUPA_JWT_ISSUER", "JWT_ISSUER"),
+		JWTAudience:     getFirstEnv("aupa-client", "AUPA_JWT_AUDIENCE", "JWT_AUDIENCE"),
+		AccessTokenTTL:  getFirstEnvDuration(15*time.Minute, "AUPA_ACCESS_TOKEN_TTL", "ACCESS_TOKEN_TTL"),
+		RefreshTokenTTL: getFirstEnvDuration(30*24*time.Hour, "AUPA_REFRESH_TOKEN_TTL", "REFRESH_TOKEN_TTL"),
 
-		Currency:      getEnv("AUPA_CURRENCY", "BDT"),
-		DefaultZoneID: getEnv("AUPA_DEFAULT_ZONE_ID", "zone_dhaka_central"),
-		DatabaseURL:   getEnv("DATABASE_URL", ""),
+		Currency:      getFirstEnv("BDT", "AUPA_CURRENCY", "CURRENCY"),
+		DefaultZoneID: getFirstEnv("zone_dhaka_central", "AUPA_DEFAULT_ZONE_ID", "DEFAULT_ZONE_ID"),
+		DatabaseURL:   getFirstEnv("", "DATABASE_URL"),
 
-		KeepAliveURL:      getFirstEnv("KEEP_ALIVE_URL", "RENDER_EXTERNAL_URL", "PUBLIC_URL"),
-		KeepAliveInterval: getEnvDuration("AUPA_KEEP_ALIVE_INTERVAL", 10*time.Minute),
+		KeepAliveURL:      getFirstEnv("", "KEEP_ALIVE_URL", "RENDER_EXTERNAL_URL", "PUBLIC_URL"),
+		KeepAliveInterval: getFirstEnvDuration(10*time.Minute, "AUPA_KEEP_ALIVE_INTERVAL", "KEEP_ALIVE_INTERVAL"),
 	}
 
 	if cfg.Environment == "production" {
@@ -68,18 +68,22 @@ func Load() (*Config, error) {
 	return cfg, nil
 }
 
-func getFirstEnv(keys ...string) string {
+func getFirstEnv(defaultVal string, keys ...string) string {
 	for _, key := range keys {
 		if val := os.Getenv(key); val != "" {
 			return val
 		}
 	}
-	return ""
+	return defaultVal
 }
 
-func getEnv(key, defaultVal string) string {
-	if val := os.Getenv(key); val != "" {
-		return val
+func getFirstEnvDuration(defaultVal time.Duration, keys ...string) time.Duration {
+	for _, key := range keys {
+		if valStr := os.Getenv(key); valStr != "" {
+			if dur, err := time.ParseDuration(valStr); err == nil {
+				return dur
+			}
+		}
 	}
 	return defaultVal
 }
