@@ -26,3 +26,5 @@ services:
         value: 15m
       - key: REFRESH_TOKEN_TTL
         value: 168h
+      - key: AUPA_KEEP_ALIVE_INTERVAL
+        value: 10m

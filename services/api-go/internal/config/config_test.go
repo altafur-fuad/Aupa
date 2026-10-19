@@ -39,3 +39,24 @@ func TestConfigProductionRequiresJWTSecret(t *testing.T) {
 		t.Fatalf("expected error in production when JWT secret is weak, got nil")
 	}
 }
+
+func TestConfigKeepAliveOptions(t *testing.T) {
+	_ = os.Setenv("RENDER_EXTERNAL_URL", "https://aupa-api.onrender.com")
+	_ = os.Setenv("AUPA_KEEP_ALIVE_INTERVAL", "5m")
+	defer func() {
+		_ = os.Unsetenv("RENDER_EXTERNAL_URL")
+		_ = os.Unsetenv("AUPA_KEEP_ALIVE_INTERVAL")
+	}()
+
+	cfg, err := Load()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if cfg.KeepAliveURL != "https://aupa-api.onrender.com" {
+		t.Errorf("expected KeepAliveURL to match RENDER_EXTERNAL_URL, got %s", cfg.KeepAliveURL)
+	}
+	if cfg.KeepAliveInterval != 5*time.Minute {
+		t.Errorf("expected 5m, got %v", cfg.KeepAliveInterval)
+	}
+}

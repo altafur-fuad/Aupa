@@ -13,6 +13,7 @@ import (
 	"github.com/altafur-fuad/Aupa/services/api-go/internal/config"
 	"github.com/altafur-fuad/Aupa/services/api-go/internal/db/postgres"
 	"github.com/altafur-fuad/Aupa/services/api-go/internal/httpapi"
+	"github.com/altafur-fuad/Aupa/services/api-go/internal/keepalive"
 )
 
 func main() {
@@ -35,11 +36,13 @@ func main() {
 
 	var repos httpapi.Repositories
 	var dbPoolClosed func() = func() {}
+	var dbInstance *postgres.DB
 	if cfg.DatabaseURL != "" {
 		db, err := postgres.NewDB(context.Background(), cfg.DatabaseURL)
 		if err != nil {
 			logger.Error("failed to connect to PostgreSQL database, falling back to in-memory test doubles", "error", err)
 		} else {
+			dbInstance = db
 			dbPoolClosed = db.Close
 			logger.Info("connected to PostgreSQL database pool successfully")
 			repos.UserRepo = postgres.NewUserRepository(db.Pool)
@@ -70,6 +73,14 @@ func main() {
 
 	// Server run context for graceful shutdown
 	serverCtx, serverStopCtx := context.WithCancel(context.Background())
+
+	// Start background keep-alive worker (keeps Render 24/7 awake and Supabase DB active)
+	keepalive.Start(serverCtx, keepalive.Config{
+		ExternalURL: cfg.KeepAliveURL,
+		Interval:    cfg.KeepAliveInterval,
+		DB:          dbInstance,
+		Logger:      logger,
+	})
 
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)

@@ -29,6 +29,10 @@ type Config struct {
 
 	// Database
 	DatabaseURL string
+
+	// Keep-Alive (Prevents Render sleep and Supabase pause)
+	KeepAliveURL      string
+	KeepAliveInterval time.Duration
 }
 
 // Load loads configuration from environment variables with safe defaults.
@@ -50,6 +54,9 @@ func Load() (*Config, error) {
 		Currency:      getEnv("AUPA_CURRENCY", "BDT"),
 		DefaultZoneID: getEnv("AUPA_DEFAULT_ZONE_ID", "zone_dhaka_central"),
 		DatabaseURL:   getEnv("DATABASE_URL", ""),
+
+		KeepAliveURL:      getFirstEnv("KEEP_ALIVE_URL", "RENDER_EXTERNAL_URL", "PUBLIC_URL"),
+		KeepAliveInterval: getEnvDuration("AUPA_KEEP_ALIVE_INTERVAL", 10*time.Minute),
 	}
 
 	if cfg.Environment == "production" {
@@ -59,6 +66,15 @@ func Load() (*Config, error) {
 	}
 
 	return cfg, nil
+}
+
+func getFirstEnv(keys ...string) string {
+	for _, key := range keys {
+		if val := os.Getenv(key); val != "" {
+			return val
+		}
+	}
+	return ""
 }
 
 func getEnv(key, defaultVal string) string {
