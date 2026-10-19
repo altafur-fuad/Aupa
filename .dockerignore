@@ -1,0 +1,10 @@
+.git
+.dart_tool
+aupa/build
+aupa/.dart_tool
+aupa/windows
+aupa/linux
+aupa/macos
+aupa/ios
+aupa/android
+*.dump
