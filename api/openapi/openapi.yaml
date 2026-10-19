@@ -1,0 +1,772 @@
+openapi: 3.0.3
+info:
+  title: Aupa API
+  description: Public versioned REST API for Aupa food delivery application.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/v1
+    description: Local development server
+paths:
+  /healthz:
+    get:
+      summary: Liveness health check
+      operationId: getHealth
+      responses:
+        '200':
+          description: Service is alive
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  time:
+                    type: string
+                    format: date-time
+
+  /readyz:
+    get:
+      summary: Readiness check
+      operationId: getReadiness
+      responses:
+        '200':
+          description: Service dependencies are ready
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ready
+                  database:
+                    type: string
+                    example: connected
+
+  /auth/register:
+    post:
+      summary: Register a new customer or merchant user
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [fullName, email, password]
+              properties:
+                fullName:
+                  type: string
+                  example: Rahim Ahmed
+                email:
+                  type: string
+                  format: email
+                  example: rahim@example.com
+                password:
+                  type: string
+                  format: password
+                  minLength: 8
+                  example: P@ssw0rd123
+                phone:
+                  type: string
+                  example: "+8801712345678"
+      responses:
+        '201':
+          description: Registration successful, contact verification required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+
+  /auth/login:
+    post:
+      summary: Authenticate user credentials
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: rahim@example.com
+                password:
+                  type: string
+                  format: password
+                  example: P@ssw0rd123
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/refresh:
+    post:
+      summary: Rotate refresh token and obtain a new short-lived access token
+      operationId: refreshToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refreshToken]
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        '200':
+          description: Tokens successfully rotated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenPair'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/logout:
+    post:
+      summary: Revoke session and refresh token
+      operationId: logoutUser
+      security:
+        - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        '204':
+          description: Successfully logged out
+
+  /auth/verify-contact:
+    post:
+      summary: Verify email or phone with 4-digit OTP
+      operationId: verifyContact
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, otp]
+              properties:
+                email:
+                  type: string
+                  format: email
+                otp:
+                  type: string
+                  minLength: 4
+                  maxLength: 6
+      responses:
+        '200':
+          description: Verification confirmed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      verified:
+                        type: boolean
+                        example: true
+
+  /me:
+    get:
+      summary: Retrieve current authenticated user profile
+      operationId: getCurrentUser
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: User profile
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /restaurants:
+    get:
+      summary: List restaurants with optional query and category filters
+      operationId: listRestaurants
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+          description: Text search for restaurant name or cuisine
+        - in: query
+          name: category
+          schema:
+            type: string
+          description: Category tag filter
+        - in: query
+          name: zoneId
+          schema:
+            type: string
+          description: Delivery service zone identifier
+      responses:
+        '200':
+          description: List of matching restaurants
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Restaurant'
+
+  /restaurants/{id}:
+    get:
+      summary: Get details for a restaurant
+      operationId: getRestaurant
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Restaurant details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Restaurant'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /restaurants/{id}/menu:
+    get:
+      summary: Get full menu item catalog for a restaurant
+      operationId: getRestaurantMenu
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Menu categories and items
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MenuItem'
+
+  /checkout/quote:
+    post:
+      summary: Server-side price calculation and cart quote
+      operationId: calculateCheckoutQuote
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [restaurantId, items, deliveryAddressId]
+              properties:
+                restaurantId:
+                  type: string
+                deliveryAddressId:
+                  type: string
+                promoCode:
+                  type: string
+                  example: AUPA50
+                items:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/CartItemRequest'
+      responses:
+        '200':
+          description: Server-authoritative price breakdown in poisha (BDT)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CheckoutQuote'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+
+  /orders:
+    post:
+      summary: Place an authoritative food delivery order
+      operationId: createOrder
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: header
+          name: Idempotency-Key
+          required: true
+          schema:
+            type: string
+          description: High-entropy idempotency key to prevent double charge/orders
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [restaurantId, deliveryAddressId, paymentMethod, items]
+              properties:
+                restaurantId:
+                  type: string
+                deliveryAddressId:
+                  type: string
+                paymentMethod:
+                  type: string
+                  enum: [cash_on_delivery, bkash, sslcommerz]
+                promoCode:
+                  type: string
+                specialInstructions:
+                  type: string
+                items:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/CartItemRequest'
+      responses:
+        '201':
+          description: Order successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Order'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '409':
+          description: Idempotency key conflict with mismatched payload
+
+    get:
+      summary: List past and active orders for authenticated customer
+      operationId: listOrders
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of user orders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Order'
+
+  /orders/{id}:
+    get:
+      summary: Get order details by ID
+      operationId: getOrder
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Order'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /orders/{id}/cancel:
+    post:
+      summary: Cancel an eligible order
+      operationId: cancelOrder
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: Order cancelled
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Order'
+        '400':
+          description: Order status does not allow cancellation
+
+  /orders/{id}/pay:
+    post:
+      summary: Initiate online payment attempt for an order
+      operationId: initiateOrderPayment
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                provider:
+                  type: string
+                  enum: [mock, bkash, sslcommerz]
+                  default: mock
+      responses:
+        '200':
+          description: Payment session initiated with redirect URL
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/PaymentSession'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /orders/{id}/tracking:
+    get:
+      summary: Get live delivery tracking status and rider coordinates
+      operationId: getOrderTracking
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Tracking information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/TrackingInfo'
+
+  /webhooks/payments/{provider}:
+    post:
+      summary: Verified payment provider webhook receiver
+      operationId: handlePaymentWebhook
+      parameters:
+        - in: path
+          name: provider
+          required: true
+          schema:
+            type: string
+            enum: [bkash, sslcommerz, mock]
+      responses:
+        '200':
+          description: Webhook acknowledged and reconciled
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: processed
+        '400':
+          description: Invalid payload or verification failure
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    ValidationError:
+      description: Request validation failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    Unauthorized:
+      description: Missing, invalid, or expired authentication token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+
+  schemas:
+    ErrorEnvelope:
+      type: object
+      required: [error, meta]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              example: VALIDATION_ERROR
+            message:
+              type: string
+              example: Invalid input parameters.
+            fields:
+              type: array
+              items:
+                type: object
+                properties:
+                  field:
+                    type: string
+                  code:
+                    type: string
+        meta:
+          type: object
+          properties:
+            requestId:
+              type: string
+              example: req_01j7...
+
+    TokenPair:
+      type: object
+      required: [accessToken, refreshToken, tokenType, expiresInSeconds]
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        tokenType:
+          type: string
+          example: Bearer
+        expiresInSeconds:
+          type: integer
+          example: 900
+
+    User:
+      type: object
+      required: [id, fullName, email, isVerified, createdAt]
+      properties:
+        id:
+          type: string
+        fullName:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        role:
+          type: string
+          enum: [customer, merchant, rider, admin]
+          default: customer
+        isVerified:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    AuthResponse:
+      type: object
+      required: [user, tokens]
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        tokens:
+          $ref: '#/components/schemas/TokenPair'
+
+    Restaurant:
+      type: object
+      required: [id, name, cuisine, rating, deliveryTimeMinutes, deliveryFeePoisha, area, isOpen]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        cuisine:
+          type: string
+        rating:
+          type: number
+          format: float
+        deliveryTimeMinutes:
+          type: integer
+        deliveryFeePoisha:
+          type: integer
+          description: Delivery fee in poisha (100 poisha = ৳1 BDT)
+        area:
+          type: string
+        isOpen:
+          type: boolean
+
+    MenuItem:
+      type: object
+      required: [id, restaurantId, name, pricePoisha, isAvailable]
+      properties:
+        id:
+          type: string
+        restaurantId:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        pricePoisha:
+          type: integer
+        category:
+          type: string
+        isAvailable:
+          type: boolean
+
+    CartItemRequest:
+      type: object
+      required: [itemId, quantity]
+      properties:
+        itemId:
+          type: string
+        quantity:
+          type: integer
+          minimum: 1
+        optionItemIds:
+          type: array
+          items:
+            type: string
+
+    CheckoutQuote:
+      type: object
+      required: [subtotalPoisha, deliveryFeePoisha, discountPoisha, vatPoisha, totalPoisha, currency]
+      properties:
+        subtotalPoisha:
+          type: integer
+        deliveryFeePoisha:
+          type: integer
+        discountPoisha:
+          type: integer
+        vatPoisha:
+          type: integer
+        totalPoisha:
+          type: integer
+        currency:
+          type: string
+          example: BDT
+
+    Order:
+      type: object
+      required: [id, customerId, restaurantId, status, paymentStatus, totalAmountPoisha, createdAt]
+      properties:
+        id:
+          type: string
+        customerId:
+          type: string
+        restaurantId:
+          type: string
+        status:
+          type: string
+          enum: [placed, accepted, preparing, ready, out_for_delivery, delivered, cancelled]
+        paymentStatus:
+          type: string
+          enum: [unpaid, pending, paid, failed, refunded]
+        totalAmountPoisha:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+
+    TrackingInfo:
+      type: object
+      required: [orderId, status, stageIndex]
+      properties:
+        orderId:
+          type: string
+        status:
+          type: string
+        stageIndex:
+          type: integer
+          minimum: 0
+          maximum: 4
+        riderName:
+          type: string
+        riderPhone:
+          type: string
+        estimatedMinutesRemaining:
+          type: integer
+
+    PaymentSession:
+      type: object
+      required: [attemptId, checkoutUrl, provider, expiresAt]
+      properties:
+        attemptId:
+          type: string
+        checkoutUrl:
+          type: string
+        provider:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time

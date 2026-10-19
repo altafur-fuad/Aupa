@@ -1,0 +1,10 @@
+{
+  "project": "Aupa",
+  "bundle": "Aupa Project Structure and Antigravity Documentation Pack",
+  "stack": ["Flutter/Dart", "Go", "Rust (optional dispatch worker)", "Supabase PostgreSQL"],
+  "authentication": "Custom Aupa authentication; Supabase Auth is not used",
+  "numbered_document_count": 15,
+  "additional_docs": ["docs/PROJECT_STRUCTURE.md", "docs/ANTIGRAVITY_BOOTSTRAP_PROMPT.md"],
+  "root_instruction_file": "AGENTS.md",
+  "note": "Documentation and instructions only; not application source code."
+}
