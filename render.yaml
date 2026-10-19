@@ -1,6 +1,7 @@
 services:
   - type: web
     name: aupa-api
+    plan: free
     runtime: go
     rootDir: services/api-go
     buildCommand: go build -o api ./cmd/api
