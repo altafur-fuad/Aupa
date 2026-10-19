@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: aupa-api
+    runtime: go
+    rootDir: services/api-go
+    buildCommand: go build -o api ./cmd/api
+    startCommand: ./api
+    healthCheckPath: /healthz
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: ENVIRONMENT
+        value: production
+      - key: CURRENCY
+        value: BDT
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_ISSUER
+        value: aupa-api
+      - key: JWT_AUDIENCE
+        value: aupa-client
+      - key: ACCESS_TOKEN_TTL
+        value: 15m
+      - key: REFRESH_TOKEN_TTL
+        value: 168h
