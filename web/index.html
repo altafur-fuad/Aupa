@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aupa — The Quickest Way to Find the Perfect Bite</title>
+  <meta name="description" content="Order delicious food from top restaurants across Dhaka with Aupa. Fast 30-minute delivery, live tracking, and mobile app download.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍔</text></svg>">
+</head>
+<body>
+
+  <!-- ================= SITE HEADER ================= -->
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a href="#" class="brand-logo" onclick="AupaApp.switchView('storefront')">
+        <div class="logo-mark">⚡</div>
+        <span>AU<span class="accent">PA</span></span>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="#restaurantsSection" id="navStorefrontLink" class="active" onclick="AupaApp.switchView('storefront')">Explore Food</a></li>
+          <li><a href="#howItWorksSection" onclick="AupaApp.switchView('storefront')">How It Works</a></li>
+          <li><a href="#workWithUsSection" onclick="AupaApp.switchView('storefront')">Work with Us</a></li>
+          <li><a href="#downloadSection" onclick="AupaApp.switchView('storefront')">Download App</a></li>
+          <li><a href="javascript:void(0)" id="navPartnerLink" onclick="AupaApp.switchView('partner')" style="color:var(--primary); font-weight:700;">Partner Portal</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="btn btn-outline btn-sm" onclick="AupaApp.openAuthModal('signin')">Sign In</button>
+        <button class="btn btn-navy btn-sm" onclick="AupaApp.openAuthModal('signup')">Sign Up</button>
+        <button class="btn-cart" onclick="AupaApp.openCart()" aria-label="Open Shopping Cart">
+          🛒
+          <span class="cart-count" style="display:none;">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= STOREFRONT VIEW ================= -->
+  <main id="storefrontView">
+
+    <!-- HERO SECTION -->
+    <section class="hero-section">
+      <!-- Floating food illustrations (Matching Reference Screenshot 1) -->
+      <div class="hero-floater floater-left">
+        <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="80" cy="80" r="50" fill="#FFD43F" opacity="0.9"/>
+          <circle cx="80" cy="80" r="42" stroke="#FFFFFF" stroke-width="4"/>
+          <line x1="80" y1="38" x2="80" y2="122" stroke="#FFFFFF" stroke-width="3"/>
+          <line x1="38" y1="80" x2="122" y2="80" stroke="#FFFFFF" stroke-width="3"/>
+          <rect x="30" y="110" width="34" height="26" rx="6" fill="#151F32"/>
+          <ellipse cx="47" cy="115" rx="13" ry="5" fill="#FFFFFF"/>
+          <circle cx="47" cy="115" r="4" fill="#DC143C"/>
+          <rect x="75" y="120" width="34" height="26" rx="6" fill="#151F32"/>
+          <ellipse cx="92" cy="125" rx="13" ry="5" fill="#FFFFFF"/>
+          <circle cx="92" cy="125" r="4" fill="#DC143C"/>
+        </svg>
+      </div>
+
+      <div class="hero-floater floater-right">
+        <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M40 140 L120 40 A100 100 0 0 1 140 120 Z" fill="#D4E3CC" stroke="#151F32" stroke-width="3"/>
+          <path d="M48 132 L115 50" stroke="#FFB800" stroke-width="8" stroke-linecap="round"/>
+          <circle cx="105" cy="100" r="8" fill="#DC143C"/>
+          <circle cx="85" cy="115" r="7" fill="#DC143C"/>
+          <circle cx="115" cy="75" r="6" fill="#10B981"/>
+          <circle cx="80" cy="95" r="6" fill="#FFB800"/>
+        </svg>
+      </div>
+
+      <div class="container hero-content">
+        <div class="hero-badge">
+          <span>⚡</span>
+          <span>Fastest 30-min Delivery Across Dhaka</span>
+        </div>
+
+        <h1 class="hero-title">
+          The quickest way to <br>find the <span class="highlight">perfect bite</span>
+        </h1>
+
+        <!-- Address Search Bar -->
+        <div class="hero-search-container">
+          <div class="search-box">
+            <span class="search-icon">📍</span>
+            <input type="text" id="heroSearchInput" class="search-input" placeholder="Enter delivery address, area, or cuisine..." autocomplete="off">
+            <button class="search-btn" onclick="AupaApp.scrollToRestaurants()">Search</button>
+          </div>
+
+          <!-- Quick location chips -->
+          <div class="quick-tags">
+            <span style="font-size:0.82rem; color:var(--text-muted); font-weight:600;">Popular Areas:</span>
+            <span class="quick-tag" onclick="AupaApp.setQuickLocation('Banani, Dhaka')">Banani</span>
+            <span class="quick-tag" onclick="AupaApp.setQuickLocation('Gulshan 1 & 2')">Gulshan</span>
+            <span class="quick-tag" onclick="AupaApp.setQuickLocation('Dhanmondi')">Dhanmondi</span>
+            <span class="quick-tag" onclick="AupaApp.setQuickLocation('Uttara')">Uttara</span>
+            <span class="quick-tag" onclick="AupaApp.setQuickLocation('Mirpur')">Mirpur</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CATEGORIES FILTER -->
+    <section class="category-section">
+      <div class="container">
+        <div class="category-scroll" id="categoryScroll">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- RESTAURANT LISTINGS -->
+    <section class="restaurant-section" id="restaurantsSection">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">Popular Restaurants Near You</h2>
+            <p class="section-subtitle" id="restaurantCountText">Showing curated spots with fast delivery</p>
+          </div>
+          <div>
+            <button class="btn btn-outline btn-sm" onclick="AupaApp.resetFilters()">Reset Filters</button>
+          </div>
+        </div>
+
+        <div class="restaurant-grid" id="restaurantGrid">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= HOW IT WORKS SECTION (Matching Screenshot 2) ================= -->
+    <section class="how-it-works-section" id="howItWorksSection">
+      <div class="container">
+        <div style="margin-bottom: 36px; text-align: left;">
+          <h2 class="section-title">How it works</h2>
+          <p class="section-subtitle">Delicious food delivered in three simple, frictionless steps</p>
+        </div>
+
+        <div class="how-grid">
+          <!-- Step 1 -->
+          <div class="how-card">
+            <div class="how-illustration">
+              <svg viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Location search bubble -->
+                <rect x="20" y="10" width="160" height="40" rx="20" fill="#FFFFFF" stroke="#151F32" stroke-width="2.5"/>
+                <circle cx="40" cy="30" r="8" fill="#FFB800"/>
+                <line x1="56" y1="30" x2="110" y2="30" stroke="#94A3B8" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="155" cy="30" r="10" fill="#151F32"/>
+                <line x1="150" y1="30" x2="160" y2="30" stroke="#FFF" stroke-width="2"/>
+                <!-- Hand holding phone -->
+                <rect x="75" y="65" width="50" height="90" rx="12" fill="#151F32"/>
+                <rect x="80" y="75" width="40" height="70" rx="6" fill="#22304A"/>
+                <circle cx="100" cy="100" r="8" stroke="#FFF" stroke-width="2"/>
+                <path d="M45 110 Q65 90 75 110" stroke="#151F32" stroke-width="5" fill="none"/>
+              </svg>
+            </div>
+            <h3 class="how-step-tag">Step 1</h3>
+            <p class="how-desc">
+              Enter your location. Type in your address or pick your neighbourhood to find all open kitchens delivering to you.
+            </p>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="how-card">
+            <div class="how-illustration">
+              <svg viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Magnifying glass inspection -->
+                <circle cx="100" cy="70" r="48" fill="#F8FAFC" stroke="#151F32" stroke-width="2.5"/>
+                <!-- Restaurant Building -->
+                <rect x="76" y="52" width="48" height="38" rx="4" fill="#DDE5D6" stroke="#151F32" stroke-width="2"/>
+                <rect x="72" y="44" width="56" height="12" rx="3" fill="#FFB800" stroke="#151F32" stroke-width="2"/>
+                <rect x="85" y="64" width="14" height="26" fill="#151F32"/>
+                <rect x="104" y="64" width="14" height="16" fill="#FFFFFF" stroke="#151F32" stroke-width="1.5"/>
+                <!-- Handle -->
+                <rect x="94" y="118" width="12" height="36" rx="4" fill="#151F32"/>
+                <circle cx="100" cy="130" r="4" fill="#FFB800"/>
+              </svg>
+            </div>
+            <h3 class="how-step-tag">Step 2</h3>
+            <p class="how-desc">
+              Now select a restaurant and a menu item. You’re one step closer to the perfect quick bite.
+            </p>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="how-card">
+            <div class="how-illustration">
+              <svg viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Flying Cash / Payment -->
+                <rect x="50" y="55" width="85" height="48" rx="6" fill="#E2EEDC" stroke="#151F32" stroke-width="2.5" transform="rotate(-10 50 55)"/>
+                <circle cx="85" cy="72" r="12" stroke="#151F32" stroke-width="2" fill="#D2E4CA"/>
+                <text x="81" y="78" font-size="16" font-weight="bold" fill="#151F32">৳</text>
+                <rect x="85" y="45" width="85" height="48" rx="6" fill="#E2EEDC" stroke="#151F32" stroke-width="2.5" transform="rotate(12 85 45)"/>
+                <circle cx="125" cy="72" r="12" stroke="#151F32" stroke-width="2" fill="#D2E4CA"/>
+                <text x="121" y="78" font-size="16" font-weight="bold" fill="#151F32">৳</text>
+                <circle cx="45" cy="35" r="10" fill="#FFB800"/>
+                <circle cx="155" cy="115" r="6" fill="#FFB800"/>
+              </svg>
+            </div>
+            <h3 class="how-step-tag">Step 3</h3>
+            <p class="how-desc">
+              Settle your payment via Cash or Mobile Banking. Then sit back and relax as our rider rushes your hot meal!
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= WORK WITH AUPA SECTION (Matching Screenshot 3 & 4) ================= -->
+    <section class="work-section" id="workWithUsSection">
+      <div class="container">
+        <div style="margin-bottom: 32px;">
+          <h2 class="section-title">Work with Aupa</h2>
+          <p class="section-subtitle">Join Bangladesh’s modern, high-reward food delivery ecosystem</p>
+        </div>
+
+        <div class="work-cards-wrap">
+          <!-- As a rider -->
+          <div class="work-card">
+            <div class="work-visual">
+              <svg viewBox="0 0 220 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="55" cy="110" r="22" stroke="#151F32" stroke-width="6" fill="#FFF"/>
+                <circle cx="165" cy="110" r="22" stroke="#151F32" stroke-width="6" fill="#FFF"/>
+                <path d="M55 110 Q90 100 110 80 L140 80 L165 110" stroke="#CCDBC3" stroke-width="14" stroke-linecap="round"/>
+                <path d="M110 80 L120 40 L100 40" stroke="#151F32" stroke-width="4" stroke-linecap="round"/>
+                <rect x="70" y="55" width="35" height="25" rx="5" fill="#CCDBC3" stroke="#151F32" stroke-width="2"/>
+                <circle cx="40" cy="30" r="12" fill="#FFB800"/>
+              </svg>
+            </div>
+            <div class="work-content">
+              <h3>As a rider</h3>
+              <p>Earn great income delivering food with weekly payouts, daily incentives, and complete schedule flexibility. All you need is a bike or bicycle.</p>
+            </div>
+            <div>
+              <button class="btn btn-outline" onclick="AupaApp.openPartnerApplicationModal('rider')">Ride with us</button>
+            </div>
+          </div>
+
+          <!-- As a partner -->
+          <div class="work-card">
+            <div class="work-visual">
+              <svg viewBox="0 0 220 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="40" y="45" width="140" height="85" rx="6" fill="#DDE7D8" stroke="#151F32" stroke-width="3"/>
+                <rect x="35" y="30" width="150" height="20" rx="5" fill="#FFB800" stroke="#151F32" stroke-width="3"/>
+                <rect x="65" y="70" width="35" height="30" fill="#151F32"/>
+                <rect x="115" y="70" width="45" height="60" fill="#FFF" stroke="#151F32" stroke-width="2"/>
+                <text x="75" y="44" font-size="11" font-weight="bold" fill="#151F32">RESTAURANT</text>
+              </svg>
+            </div>
+            <div class="work-content">
+              <h3>As a partner</h3>
+              <p>Aupa helps food businesses grow rapidly with online order management, customer marketing, automated dispatch, and zero hidden fees.</p>
+            </div>
+            <div>
+              <button class="btn btn-outline" onclick="AupaApp.openPartnerApplicationModal('restaurant')">Partner with us</button>
+            </div>
+          </div>
+
+          <!-- As a colleague -->
+          <div class="work-card">
+            <div class="work-visual">
+              <svg viewBox="0 0 220 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="65" cy="50" r="24" fill="#CCDBC3"/>
+                <path d="M40 100 Q65 75 90 100" fill="#151F32"/>
+                <circle cx="150" cy="55" r="32" stroke="#151F32" stroke-width="4" fill="none"/>
+                <circle cx="150" cy="55" r="22" stroke="#151F32" stroke-width="4" fill="#FFB800"/>
+                <circle cx="150" cy="55" r="10" fill="#151F32"/>
+                <path d="M100 85 L125 65 L145 75" stroke="#151F32" stroke-width="4" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="work-content">
+              <h3>As a colleague</h3>
+              <p>Be part of a passionate, high-performance team that is engineering world-class delivery technology and logistics infrastructure in Bangladesh.</p>
+            </div>
+            <div>
+              <button class="btn btn-outline" onclick="AupaApp.openPartnerApplicationModal('colleague')">Work with us</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= DOWNLOAD APP SECTION (Matching Screenshot 4) ================= -->
+    <section class="download-section" id="downloadSection">
+      <div class="container">
+        <div class="download-banner">
+          <div class="download-info">
+            <h2>Order easily!</h2>
+            <p>
+              Get the most delicious bites delivered straight to your door with Aupa. 
+              Our lightning-fast delivery carries a wide variety of cuisines from your favorite local kitchens.
+            </p>
+
+            <div class="download-actions">
+              <button class="btn-apk-download" onclick="AupaApp.downloadApk()">
+                <svg fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-1.0002s.4482-1.0002.9993-1.0002c.5516 0 1.0002.4486 1.0002 1.0002s-.4486 1.0002-1.0002 1.0002m-11.046 0c-.5511 0-.9993-.4486-.9993-1.0002s.4482-1.0002.9993-1.0002c.5516 0 1.0002.4486 1.0002 1.0002s-.4486 1.0002-1.0002 1.0002m11.4045-6.02l1.996-3.457c.106-.1835.043-.4182-.14-.5244-.183-.1061-.418-.0431-.524.1404l-2.023 3.504c-1.428-.65-3.023-1.012-4.74-1.012-1.717 0-3.312.362-4.74 1.012l-2.023-3.504c-.106-.1835-.341-.2465-.524-.1404-.183.1062-.246.3409-.14.5244l1.996 3.457c-3.15 1.708-5.289 4.887-5.556 8.653h21.93c-.267-3.766-2.406-6.945-5.556-8.653"/>
+                </svg>
+                <span>Download Android APK</span>
+              </button>
+            </div>
+
+            <!-- APK download progress bar -->
+            <progress id="apkDownloadProgress" value="0" max="100" style="display:none; width:260px; height:8px; margin-top:14px; accent-color:var(--primary);"></progress>
+            <p class="apk-meta">Package: Aupa-release-v1.0.apk • Direct Secure Download</p>
+          </div>
+
+          <div class="phone-mockup-wrapper">
+            <div class="phone-frame">
+              <div class="phone-screen">
+                <div style="font-weight:800; color:var(--primary); font-size:1.1rem; margin-bottom:12px;">AU<span style="color:#151F32;">PA</span></div>
+                <div style="background:#FFF; padding:12px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.06); margin-bottom:12px;">
+                  <div style="font-weight:700; font-size:0.85rem;">⚡ 30 min delivery</div>
+                  <div style="font-size:0.75rem; color:#64748B;">Dhaka Central Hub</div>
+                </div>
+                <div style="background:#E2E8F0; height:120px; border-radius:12px; margin-bottom:12px; display:flex; align-items:center; justify-content:center; font-size:2rem;">
+                  🍕
+                </div>
+                <div style="background:var(--primary); color:white; text-align:center; padding:10px; border-radius:9999px; font-weight:700; font-size:0.85rem; margin-top:auto;">
+                  Order Food Now
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= RESTAURANT PARTNER & ADMIN PORTAL ================= -->
+  <section id="portalView" class="portal-view">
+    <div class="container">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:28px;">
+        <div>
+          <h2 class="section-title">Restaurant Management Portal</h2>
+          <p class="section-subtitle">Manage live orders, catalog menus, and branch operating status</p>
+        </div>
+        <div style="display:flex; gap:12px; align-items:center;">
+          <span id="storeStatusBadge" style="background:#D1FAE5; color:#065F46; padding:6px 14px; border-radius:9999px; font-weight:700; font-size:0.85rem;">
+            Accepting Orders (Online)
+          </span>
+          <button class="btn btn-outline btn-sm" id="storeToggleBtn" onclick="AupaAdmin.toggleStoreStatus()">Close Restaurant</button>
+          <button class="btn btn-navy btn-sm" onclick="AupaApp.switchView('storefront')">← Back to Storefront</button>
+        </div>
+      </div>
+
+      <!-- Stats Overview -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h5>Today's Revenue</h5>
+          <p id="statTotalRevenue">৳0</p>
+        </div>
+        <div class="stat-card">
+          <h5>Active Kitchen Orders</h5>
+          <p id="statActiveOrders">0</p>
+        </div>
+        <div class="stat-card">
+          <h5>Completed Deliveries</h5>
+          <p id="statCompletedOrders">0</p>
+        </div>
+        <div class="stat-card">
+          <h5>Average Prep Time</h5>
+          <p>18 mins</p>
+        </div>
+      </div>
+
+      <!-- Live Incoming Orders Table -->
+      <div style="background:white; border-radius:16px; border:1px solid var(--border-light); padding:24px; margin-bottom:32px; box-shadow:var(--shadow-sm);">
+        <h3 style="font-size:1.25rem; font-weight:800; margin-bottom:16px;">Live Incoming Orders</h3>
+        <div style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; text-align:left;">
+            <thead>
+              <tr style="border-bottom:2px solid var(--border-light); color:var(--text-muted); font-size:0.85rem;">
+                <th style="padding:10px 14px;">Order ID</th>
+                <th style="padding:10px 14px;">Customer</th>
+                <th style="padding:10px 14px;">Items</th>
+                <th style="padding:10px 14px;">Amount</th>
+                <th style="padding:10px 14px;">Status</th>
+                <th style="padding:10px 14px;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="adminOrdersTableBody">
+              <!-- Rendered via admin.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Menu Manager -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+        <div style="background:white; border-radius:16px; border:1px solid var(--border-light); padding:24px; box-shadow:var(--shadow-sm);">
+          <h3 style="font-size:1.15rem; font-weight:800; margin-bottom:16px;">Current Menu Items</h3>
+          <div id="adminMenuItemsList" style="max-height:380px; overflow-y:auto;">
+            <!-- Rendered via admin.js -->
+          </div>
+        </div>
+
+        <div style="background:white; border-radius:16px; border:1px solid var(--border-light); padding:24px; box-shadow:var(--shadow-sm);">
+          <h3 style="font-size:1.15rem; font-weight:800; margin-bottom:16px;">Add New Dish to Menu</h3>
+          <form onsubmit="event.preventDefault(); AupaAdmin.addNewMenuItem(itemTitle.value, itemPrice.value, itemTag.value, itemDesc.value); this.reset();">
+            <div class="form-group">
+              <label>Dish Name *</label>
+              <input type="text" id="itemTitle" class="form-control" placeholder="e.g. Special Beef Tehari" required>
+            </div>
+            <div class="form-group">
+              <label>Price in BDT (৳) *</label>
+              <input type="number" id="itemPrice" class="form-control" placeholder="e.g. 280" required>
+            </div>
+            <div class="form-group">
+              <label>Highlight Tag</label>
+              <input type="text" id="itemTag" class="form-control" placeholder="e.g. Bestseller, Chef Special">
+            </div>
+            <div class="form-group">
+              <label>Description</label>
+              <textarea id="itemDesc" class="form-control" rows="2" placeholder="Brief description of flavors and ingredients"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;">Save to Menu</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SITE FOOTER (Matching Screenshot 5) ================= -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div class="brand-logo">
+            <div class="logo-mark">⚡</div>
+            <span>AU<span style="color:var(--primary);">PA</span></span>
+          </div>
+          <p>
+            The fastest food delivery platform in Bangladesh. Delicious meals from Dhaka's finest kitchens delivered warm and fresh.
+          </p>
+          <div class="social-links">
+            <a href="#" class="social-btn" aria-label="Facebook">f</a>
+            <a href="#" class="social-btn" aria-label="Instagram">📸</a>
+            <a href="#" class="social-btn" aria-label="LinkedIn">in</a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4>Social</h4>
+          <ul>
+            <li><a href="#">Facebook</a></li>
+            <li><a href="#">Instagram</a></li>
+            <li><a href="#">LinkedIn</a></li>
+            <li><a href="#">Twitter / X</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Get help</h4>
+          <ul>
+            <li><a href="#">Help & Support</a></li>
+            <li><a href="#" onclick="AupaApp.openPartnerApplicationModal('restaurant')">Partner with us</a></li>
+            <li><a href="#" onclick="AupaApp.openPartnerApplicationModal('restaurant')">Add your restaurant</a></li>
+            <li><a href="#" onclick="AupaApp.openPartnerApplicationModal('rider')">Sign up to deliver</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Discover</h4>
+          <ul>
+            <li><a href="#">Read our blog</a></li>
+            <li><a href="#">Buy gift card</a></li>
+            <li><a href="#">Restaurants nearby</a></li>
+            <li><a href="#">Save on first order</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>© 2026 Aupa Delivery Ltd. All rights reserved.</p>
+        <p>Built with ❤️ for Bangladesh</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ================= CART SLIDE-OUT DRAWER ================= -->
+  <div class="modal-overlay" id="cartOverlay" onclick="AupaApp.closeCart()"></div>
+  <aside class="cart-drawer" id="cartDrawer">
+    <div class="cart-header">
+      <h3 style="font-size:1.2rem; font-weight:800;">Your Food Basket</h3>
+      <button class="modal-close" onclick="AupaApp.closeCart()">✕</button>
+    </div>
+
+    <div class="cart-items-list" id="cartItemsList">
+      <!-- Injected via cart.js -->
+    </div>
+
+    <div id="cartEmptyState" style="text-align:center; padding:60px 20px; color:var(--text-muted);">
+      <div style="font-size:3rem; margin-bottom:12px;">🛍️</div>
+      <h4 style="font-weight:700; color:var(--text-main); margin-bottom:6px;">Your basket is empty</h4>
+      <p style="font-size:0.9rem;">Add dishes from any restaurant to start your order.</p>
+    </div>
+
+    <div class="cart-footer" id="cartFooterSummary" style="display:none;">
+      <!-- Promo Code -->
+      <div style="display:flex; gap:8px; margin-bottom:14px;">
+        <input type="text" id="promoCodeInput" class="form-control" placeholder="Promo code (e.g. AUPA50)" style="padding:8px 12px; font-size:0.88rem;">
+        <button class="btn btn-navy btn-sm" onclick="AupaCart.applyPromoCode(promoCodeInput.value)">Apply</button>
+      </div>
+
+      <div class="cart-summary-line">
+        <span>Subtotal</span>
+        <strong id="cartSubtotal">৳0</strong>
+      </div>
+      <div class="cart-summary-line">
+        <span>Estimated Delivery</span>
+        <strong id="cartDelivery">৳40</strong>
+      </div>
+      <div class="cart-summary-line">
+        <span>Govt VAT (5%)</span>
+        <strong id="cartVat">৳0</strong>
+      </div>
+      <div class="cart-summary-line total">
+        <span>Total Payable</span>
+        <strong id="cartTotal" style="color:var(--primary); font-size:1.3rem;">৳0</strong>
+      </div>
+
+      <button class="btn btn-primary" style="width:100%; margin-top:16px;" onclick="AupaApp.openCheckoutModal()">
+        Proceed to Checkout →
+      </button>
+    </div>
+  </aside>
+
+  <!-- ================= RESTAURANT MENU MODAL ================= -->
+  <div class="modal-overlay" id="menuModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div>
+          <h3 id="menuModalTitle">Restaurant Name</h3>
+          <p id="menuModalSubtitle" style="font-size:0.85rem; color:var(--text-muted); margin-top:2px;"></p>
+        </div>
+        <button class="modal-close" onclick="AupaApp.closeAllModals()">✕</button>
+      </div>
+      <div class="modal-body" id="menuModalItems">
+        <!-- Injected via app.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= CHECKOUT MODAL ================= -->
+  <div class="modal-overlay" id="checkoutModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>Complete Your Order</h3>
+        <button class="modal-close" onclick="AupaApp.closeAllModals()">✕</button>
+      </div>
+      <div class="modal-body">
+        <form onsubmit="AupaApp.handleCheckoutSubmit(event)">
+          <div class="form-group">
+            <label>Full Name *</label>
+            <input type="text" id="checkoutName" class="form-control" placeholder="Your name" required>
+          </div>
+          <div class="form-group">
+            <label>Phone Number *</label>
+            <input type="tel" id="checkoutPhone" class="form-control" placeholder="01XXXXXXXXX" required>
+          </div>
+          <div class="form-group">
+            <label>Delivery Address *</label>
+            <textarea id="checkoutAddress" class="form-control" rows="2" placeholder="House, Road, Area, Dhaka" required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Payment Method</label>
+            <div style="display:flex; flex-direction:column; gap:8px; margin-top:6px;">
+              <label style="display:flex; align-items:center; gap:10px; font-weight:normal; cursor:pointer;">
+                <input type="radio" name="paymentMethod" value="Cash on Delivery" checked>
+                <span>💵 Cash on Delivery</span>
+              </label>
+              <label style="display:flex; align-items:center; gap:10px; font-weight:normal; cursor:pointer;">
+                <input type="radio" name="paymentMethod" value="bKash Online">
+                <span>📱 bKash (Fast Digital Payment)</span>
+              </label>
+              <label style="display:flex; align-items:center; gap:10px; font-weight:normal; cursor:pointer;">
+                <input type="radio" name="paymentMethod" value="Nagad Online">
+                <span>💳 Nagad Online</span>
+              </label>
+            </div>
+          </div>
+
+          <div style="background:var(--bg-subtle); padding:16px; border-radius:12px; margin-bottom:20px;">
+            <div style="display:flex; justify-content:space-between; font-weight:700;">
+              <span>Total to Pay:</span>
+              <span id="checkoutTotalText" style="color:var(--primary); font-size:1.2rem;">৳0</span>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width:100%;">
+            Confirm & Place Order
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= LIVE ORDER TRACKER MODAL ================= -->
+  <div class="modal-overlay" id="trackingModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div>
+          <h3>🎉 Order Confirmed!</h3>
+          <p id="trackerOrderId" style="font-weight:700; color:var(--primary); font-size:0.9rem;"></p>
+        </div>
+        <button class="modal-close" onclick="AupaApp.closeAllModals()">✕</button>
+      </div>
+      <div class="modal-body" style="text-align:center;">
+        <div style="font-size:3.5rem; margin:10px 0;">🛵</div>
+        <h4 style="font-size:1.3rem; font-weight:800; color:var(--accent-navy); margin-bottom:6px;">Kitchen is preparing your food</h4>
+        <p style="color:var(--text-muted); font-size:0.92rem; margin-bottom:24px;">Estimated arrival: <strong>25 - 35 minutes</strong></p>
+
+        <!-- Step tracker -->
+        <div style="display:flex; justify-content:space-between; margin-bottom:28px; position:relative;">
+          <div style="flex:1; text-align:center;">
+            <div style="width:28px; height:28px; border-radius:50%; background:var(--primary); color:white; margin:0 auto 6px; font-weight:bold; line-height:28px;">✓</div>
+            <span style="font-size:0.75rem; font-weight:700;">Received</span>
+          </div>
+          <div style="flex:1; text-align:center;">
+            <div style="width:28px; height:28px; border-radius:50%; background:var(--primary); color:white; margin:0 auto 6px; font-weight:bold; line-height:28px;">2</div>
+            <span style="font-size:0.75rem; font-weight:700; color:var(--primary);">Preparing</span>
+          </div>
+          <div style="flex:1; text-align:center;">
+            <div style="width:28px; height:28px; border-radius:50%; background:#E2E8F0; color:#64748B; margin:0 auto 6px; font-weight:bold; line-height:28px;">3</div>
+            <span style="font-size:0.75rem; color:#64748B;">On the way</span>
+          </div>
+          <div style="flex:1; text-align:center;">
+            <div style="width:28px; height:28px; border-radius:50%; background:#E2E8F0; color:#64748B; margin:0 auto 6px; font-weight:bold; line-height:28px;">4</div>
+            <span style="font-size:0.75rem; color:#64748B;">Delivered</span>
+          </div>
+        </div>
+
+        <div style="background:var(--bg-subtle); padding:16px; border-radius:12px; text-align:left; font-size:0.88rem; margin-bottom:20px;">
+          <div style="margin-bottom:6px;"><strong>Delivery To:</strong> <span id="trackerAddress"></span></div>
+          <div><strong>Payment:</strong> <span id="trackerTotal"></span></div>
+        </div>
+
+        <button class="btn btn-navy" style="width:100%;" onclick="AupaApp.closeAllModals()">
+          Back to Browse Food
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PARTNER APPLICATION MODAL ================= -->
+  <div class="modal-overlay" id="partnerModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div>
+          <h3 id="partnerModalTitle">Partner with Aupa</h3>
+          <p id="partnerModalSubtitle" style="font-size:0.85rem; color:var(--text-muted);"></p>
+        </div>
+        <button class="modal-close" onclick="AupaApp.closeAllModals()">✕</button>
+      </div>
+      <div class="modal-body">
+        <form onsubmit="event.preventDefault(); alert('Application received! The Aupa team will call you within 24 hours.'); AupaApp.closeAllModals();">
+          <div class="form-group">
+            <label>Full Name / Business Name *</label>
+            <input type="text" class="form-control" required placeholder="e.g. Sultan's Dine / Md. Karim">
+          </div>
+          <div class="form-group">
+            <label>Phone Number *</label>
+            <input type="tel" class="form-control" required placeholder="01XXXXXXXXX">
+          </div>
+          <div class="form-group">
+            <label>Operating City / Area *</label>
+            <input type="text" class="form-control" required placeholder="e.g. Dhanmondi, Dhaka">
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%;">Submit Application</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= AUTH MODAL ================= -->
+  <div class="modal-overlay" id="authModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="authModalTitle">Sign In to Aupa</h3>
+        <button class="modal-close" onclick="AupaApp.closeAllModals()">✕</button>
+      </div>
+      <div class="modal-body">
+        <form onsubmit="event.preventDefault(); alert('Signed in successfully!'); AupaApp.closeAllModals();">
+          <div class="form-group">
+            <label>Mobile Number or Email *</label>
+            <input type="text" class="form-control" required placeholder="01XXXXXXXXX or user@example.com">
+          </div>
+          <div class="form-group">
+            <label>Password *</label>
+            <input type="password" class="form-control" required placeholder="••••••••">
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%;">Continue</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="js/data.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

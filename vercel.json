@@ -1,13 +1,16 @@
 {
   "version": 2,
-  "buildCommand": "cd aupa && if [ ! -d \"$HOME/flutter\" ]; then git clone https://github.com/flutter/flutter.git --depth 1 -b stable $HOME/flutter; fi && export PATH=\"$PATH:$HOME/flutter/bin\" && flutter config --no-analytics && flutter build web --release",
-  "outputDirectory": "aupa/build/web",
+  "outputDirectory": "web",
   "routes": [
     {
       "handle": "filesystem"
     },
     {
-      "src": "/.*",
+      "src": "/downloads/(.*)",
+      "dest": "/downloads/$1"
+    },
+    {
+      "src": "/(.*)",
       "dest": "/index.html"
     }
   ]
